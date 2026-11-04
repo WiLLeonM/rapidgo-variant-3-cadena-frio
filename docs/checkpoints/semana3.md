@@ -13,4 +13,4 @@ La lógica de calidad y KPI vive en `airflow/dags/cadena_frio_logica.py`, sin im
 Una ejecución falló en `calidad_datos` con retención del 89,47 % (221 de 247 filas) frente al umbral del 90 %. Con el productor activo, `raw` va por delante de `processed` porque son consultas de streaming distintas. Se detuvo el productor, se esperó a que Spark terminara de escribir y la siguiente ejecución pasó con retención del 100 %. Además, el reporte muestra 424 `evento_id` repetidos de 426 eventos: el productor usa los JSON de `samples/` y no genera un `evento_id` nuevo (solo `event_id`).
 
 5. **Enlaces:**
-Issue #8 - PR #
+Issue #8 - PR #19
