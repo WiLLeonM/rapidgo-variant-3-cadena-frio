@@ -13,7 +13,7 @@ El flujo de datos planificado para las próximas semanas es el siguiente:
 `Productor de Eventos (Python) -> Apache Kafka -> Spark Structured Streaming -> Data Lake (Parquet) -> Apache Airflow (Orquestación)`
 
 ## 3. Organización del Repositorio
-- `airflow/`: DAGs para orquestación (Semana 3).
+- `airflow/`: DAGs para orquestación (Semana 3): `cadena_frio_calidad_dag.py` (DAG) y `cadena_frio_logica.py` (lógica probada con pytest).
 - `producer/`: Código del generador de eventos (Semana 2).
 - `spark/`: Scripts de procesamiento en streaming (Semana 2).
 - `tests/`: Pruebas automatizadas.
@@ -53,3 +53,31 @@ El contrato oficial se encuentra documentado en `samples/evento_cadena_frio.json
 - `temperatura_c`: Temperatura en grados Celsius.
 - `humedad_pct`: Porcentaje de humedad.
 - `estado`: Estado del pedido ("EN_RUTA").
+
+## 6. Orquestación con Airflow (Semana 3)
+
+DAG `cadena_frio_calidad_reportes` (`airflow/dags/cadena_frio_calidad_dag.py`), 6 tareas:
+
+```
+verificar_datalake -> validar_datos -> [calidad_datos, calcular_kpis] -> generar_reporte -> resumen_kpi
+```
+
+| Tarea | Qué hace |
+|---|---|
+| `verificar_datalake` | Comprueba que `raw/` y `processed/` tengan Parquet (reintenta 4 veces si Spark aún no escribió) |
+| `validar_datos` | Valida `processed/eventos` contra el contrato: columnas, nulos, valores imposibles, duplicados |
+| `calidad_datos` | Completitud, validez, unicidad y retención raw→processed; si no cumple umbrales el DAG falla |
+| `calcular_kpis` | KPI 1, 2 y 3 y alertas 1 y 2 por pedido (`docs/kpi_alertas.md`) |
+| `generar_reporte` | Escribe JSON, Markdown y CSV en `datalake/reportes/` |
+| `resumen_kpi` | Deja el resumen de KPI en el log de la tarea |
+
+Las tareas se pasan información con **XCom**; `retries` está en `default_args` (2) y en `verificar_datalake` (4).
+
+**Ejecutar:**
+1. Tener datos en el Data Lake (Kafka + `docker compose up spark-job` + `python producer/producer.py`, ver sección 4 y `spark/README.md`).
+2. `docker compose up airflow` (la primera vez instala pandas y pyarrow, tarda unos minutos).
+3. Abrir http://localhost:8081, usuario `admin`; la contraseña sale en los logs: `docker compose logs airflow` (buscar *password*).
+4. Activar el DAG `cadena_frio_calidad_reportes` y pulsar *Trigger DAG*.
+5. Reporte generado en `datalake/reportes/reporte_cadena_frio_<fecha>.md`.
+
+Variables opcionales: `MIN_CALIDAD_PCT` (95), `MIN_RETENCION_PCT` (90), `EXPOSICION_MINUTOS` (10), `MUESTREO_SEGUNDOS` (2), `MAX_INTERVALO_SEGUNDOS` (300).

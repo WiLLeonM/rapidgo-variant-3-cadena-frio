@@ -1,0 +1,47 @@
+{
+  "titulo": "Reporte de calidad y KPI - Cadena de frío (RapidGo, equipo 7)",
+  "fecha_ejecucion": "2026-11-04",
+  "generado_en": "2026-11-04T22:34:22.274308+00:00",
+  "capas_datalake": {
+    "raw/eventos": 29,
+    "processed/eventos": 28,
+    "curated/kpis_ventana": 171,
+    "curated/alertas_temperatura_critica": 31,
+    "curated/alertas_exposicion_prolongada": 0
+  },
+  "validacion": {
+    "filas": 426,
+    "filas_con_nulos": 0,
+    "filas_valores_imposibles": 0,
+    "duplicados": 0,
+    "clave_duplicados": "kafka_partition+kafka_offset",
+    "evento_id_repetidos_informativo": 424,
+    "pedidos": 333,
+    "primer_evento": "2026-11-04T22:18:03.463193+00:00",
+    "ultimo_evento": "2026-11-04T22:32:15.006309+00:00"
+  },
+  "calidad": {
+    "filas_raw": 426,
+    "filas_processed": 426,
+    "completitud_pct": 100.0,
+    "validez_pct": 100.0,
+    "unicidad_pct": 100.0,
+    "retencion_pct": 100.0,
+    "umbral_calidad_pct": 95.0,
+    "umbral_retencion_pct": 90.0,
+    "aprobado": true,
+    "fallos": []
+  },
+  "kpis": {
+    "pedidos": 333,
+    "eventos": 426,
+    "minutos_fuera_rango_total": 33.87,
+    "pct_dentro_rango_global": 78.08,
+    "episodios_fuera_rango": 98,
+    "episodio_max_min": 4.84,
+    "alertas_temp_critica": 99,
+    "pedidos_con_exposicion_prolongada": 0,
+    "pedido_mas_afectado": "PED-638",
+    "minutos_fuera_rango_pedido_mas_afectado": 4.87
+  }
+}
