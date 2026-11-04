@@ -60,3 +60,20 @@ services:
       --conf spark.jars.ivy=/tmp/.ivy2
       --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.7
       /app/spark/streaming_job.py
+
+  # Apache Airflow (orquestación, Semana 3). UI: http://localhost:8081
+  # Usuario: admin; la contraseña se genera al arrancar: docker compose logs airflow | findstr password
+  # Se ejecuta con: docker compose up airflow
+  airflow:
+    image: apache/airflow:2.9.3
+    ports:
+      - "8081:8080"
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      _PIP_ADDITIONAL_REQUIREMENTS: "pandas pyarrow"
+      DATALAKE_PATH: /opt/airflow/datalake
+      MUESTREO_SEGUNDOS: "2"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./datalake:/opt/airflow/datalake
+    command: standalone

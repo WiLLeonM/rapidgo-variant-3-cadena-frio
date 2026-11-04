@@ -224,3 +224,8 @@ datalake/raw/
 datalake/processed/
 datalake/curated/
 datalake/checkpoints/
+
+# Airflow
+airflow/logs/
+airflow/*.db
+datalake/reportes/
