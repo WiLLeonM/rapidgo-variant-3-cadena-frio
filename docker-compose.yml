@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -23,25 +21,27 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   spark-master:
-    image: bitnami/spark:3.5
+    image: apache/spark:3.5.1
     environment:
       - SPARK_MODE=master
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
     ports:
       - "8080:8080"
       - "7077:7077"
 
   spark-worker:
-    image: bitnami/spark:3.5
+    image: apache/spark:3.5.1
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
     depends_on:
       - spark-master
 
   # Job de Spark Structured Streaming (Kafka -> Data Lake en Parquet).
   # Se ejecuta con: docker compose up spark-job
   spark-job:
-    image: apache/spark:3.5.7-python3
+    image: apache/spark:3.5.1
     depends_on:
       - kafka
     user: root
@@ -51,6 +51,7 @@ services:
       KAFKA_TOPIC: eventos-cadena-frio
       DATALAKE_PATH: /app/datalake
       MUESTREO_SEGUNDOS: "2"
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
     volumes:
       - ./spark:/app/spark
       - ./datalake:/app/datalake
@@ -58,16 +59,16 @@ services:
       /opt/spark/bin/spark-submit
       --master local[2]
       --conf spark.jars.ivy=/tmp/.ivy2
-      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.7
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1
       /app/spark/streaming_job.py
 
   # Apache Airflow (orquestación, Semana 3). UI: http://localhost:8081
-  # Usuario: admin; la contraseña se genera al arrancar: docker compose logs airflow | findstr password
+  # Usuario: admin; la contraseña se genera al arrancar: docker compose logs airflow | grep password
   # Se ejecuta con: docker compose up airflow
   airflow:
     image: apache/airflow:2.9.3
     ports:
-      - "8081:8080"
+      - "8085:8080"
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       _PIP_ADDITIONAL_REQUIREMENTS: "pandas pyarrow"
