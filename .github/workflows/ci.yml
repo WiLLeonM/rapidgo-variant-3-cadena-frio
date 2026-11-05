@@ -38,3 +38,7 @@ jobs:
 
       - name: Validar Docker Compose
         run: docker compose config -q
+
+      - name: Validar sintaxis de los DAGs de Airflow
+        run: |
+          python -m py_compile airflow/dags/cadena_frio_calidad_dag.py airflow/dags/cadena_frio_logica.py
