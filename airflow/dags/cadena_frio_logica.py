@@ -82,6 +82,7 @@ def verificar_capas(datalake: str) -> dict:
     """
     resultado = {"datalake": datalake, "capas": {}, "faltantes_opcionales": []}
     faltantes = []
+    
     for capa in CAPAS_REQUERIDAS + CAPAS_OPCIONALES:
         n = len(archivos_parquet(os.path.join(datalake, capa)))
         resultado["capas"][capa] = n
