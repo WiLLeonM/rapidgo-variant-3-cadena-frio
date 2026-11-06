@@ -95,3 +95,48 @@ def test_retencion_inferior_al_90_por_ciento_rechaza():
     assert calidad["retencion_pct"] == 80.0
     assert calidad["aprobado"] is False
     assert any("retencion" in fallo for fallo in calidad["fallos"])
+
+import json
+from pathlib import Path
+
+from jsonschema import Draft202012Validator, FormatChecker
+
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+
+SCHEMA_PATH = (
+    ROOT_DIR / "docs" / "schemas" / "evento_cadena_frio.schema.json"
+)
+
+SAMPLES_DIR = ROOT_DIR / "samples"
+
+with SCHEMA_PATH.open(encoding="utf-8") as archivo:
+    ESQUEMA = json.load(archivo)
+
+VALIDADOR = Draft202012Validator(
+    ESQUEMA,
+    format_checker=FormatChecker()
+)
+
+
+def cargar_evento(nombre):
+    with (SAMPLES_DIR / nombre).open(encoding="utf-8") as archivo:
+        return json.load(archivo)
+
+
+def test_evento_de_muestra_valido():
+    evento = cargar_evento("evento_cadena_frio.json")
+
+    assert VALIDADOR.is_valid(evento)
+
+
+def test_evento_fuera_de_rango_es_valido_estructuralmente():
+    evento = cargar_evento("evento_fuera_de_rango.json")
+
+    assert VALIDADOR.is_valid(evento)
+
+
+def test_evento_invalido_no_cumple_contrato():
+    evento = cargar_evento("evento_invalido.json")
+
+    assert not VALIDADOR.is_valid(evento)
