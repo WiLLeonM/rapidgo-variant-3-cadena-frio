@@ -150,3 +150,14 @@ def test_verificar_capas_con_parquet():
         r = lg.verificar_capas(tmp)
         assert r["capas"]["raw/eventos"] == 1
         assert "curated/kpis_ventana" in r["faltantes_opcionales"]
+
+def test_calidad_rechaza_producto_invalido():
+    df = _df([("PED-1", i, 5.0, 50.0) for i in range(19)])
+    df.loc[0, "producto_tipo"] = "producto_no_refrigerado"
+
+    validacion = lg.validar_eventos(df)
+    calidad = lg.evaluar_calidad(validacion, filas_raw=20)
+
+    assert validacion["filas_producto_invalido"] == 1
+    assert calidad["validez_pct"] == pytest.approx(94.74)
+    assert calidad["aprobado"] is False
