@@ -29,6 +29,7 @@ def crear_eventos(cantidad, humedad_nula=None):
             "evento_id": f"evt-{i}",
             "pedido_id": "PED-001",
             "vehiculo_id": "VEH-001",
+            "producto_tipo": "producto_refrigerado",
             "timestamp": BASE + timedelta(minutes=i),
             "temperatura_c": 5.0,
             "humedad_pct": None if i in (humedad_nula or []) else 50.0,
