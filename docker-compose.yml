@@ -51,7 +51,6 @@ services:
       KAFKA_TOPIC: eventos-cadena-frio
       DATALAKE_PATH: /app/datalake
       MUESTREO_SEGUNDOS: "2"
-      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
     volumes:
       - ./spark:/app/spark
       - ./datalake:/app/datalake
