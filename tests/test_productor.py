@@ -46,3 +46,9 @@ def test_productor_no_agrega_campos_fuera_del_contrato():
     assert "event_id" not in evento
     assert "equipo" not in evento
     assert "evento_id" in evento
+
+def test_productor_mantiene_el_mismo_pedido():
+    evento1 = cargar_y_actualizar_evento(str(SAMPLE_PATH))
+    evento2 = cargar_y_actualizar_evento(str(SAMPLE_PATH))
+
+    assert evento1["pedido_id"] == evento2["pedido_id"]
