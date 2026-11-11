@@ -10,6 +10,8 @@ from kafka import KafkaProducer
 KAFKA_BROKER = 'localhost:9092'
 TOPIC = 'eventos-cadena-frio'
 EQUIPO = 'equipo-7'
+PEDIDOS = [f"PED-{i}" for i in range(100, 106)]
+pedido_id_actual = random.choice(PEDIDOS)
 
 # Rutas a los archivos JSON
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -17,17 +19,16 @@ FILE_NORMAL = os.path.join(BASE_DIR, 'samples', 'evento_cadena_frio.json')
 FILE_ALERTA = os.path.join(BASE_DIR, 'samples', 'evento_fuera_de_rango.json')
 
 def cargar_y_actualizar_evento(filepath):
-    """Lee el JSON base, actualiza id, fecha y retorna el dict"""
+    """Lee el JSON base, actualiza el ID y la fecha, y retorna el dict."""
     with open(filepath, 'r', encoding='utf-8') as f:
         evento = json.load(f)
-    
-    # Actualizamos los datos dinámicos
-    evento['event_id'] = str(uuid.uuid4())
-    evento['equipo'] = EQUIPO
+
+    # Actualizamos los datos dinámicos según el contrato JSON
+    evento['evento_id'] = str(uuid.uuid4())
     evento['timestamp'] = datetime.now(timezone.utc).isoformat()
     
-    # Asignamos un pedido aleatorio para que varíe (y podamos probar la Key)
-    evento['pedido_id'] = f"PED-{random.randint(100, 999)}"
+    # Mantenemos el mismo pedido durante toda la ejecución
+    evento['pedido_id'] = pedido_id_actual
     
     return evento
 
@@ -52,7 +53,7 @@ def main():
             key = evento['pedido_id']
             
             producer.send(TOPIC, key=key, value=evento)
-            print(f"Enviado: Key={key} | Temp={evento.get('temperatura_c')}°C | ID={evento['event_id']}")
+            print(f"Enviado: Key={key} | Temp={evento.get('temperatura_c')}°C | ID={evento['evento_id']}")
             
             time.sleep(2)
     except KeyboardInterrupt:

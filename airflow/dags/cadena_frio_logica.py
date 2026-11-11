@@ -38,8 +38,13 @@ MIN_CALIDAD_PCT = float(os.getenv("MIN_CALIDAD_PCT", "95"))
 MIN_RETENCION_PCT = float(os.getenv("MIN_RETENCION_PCT", "90"))
 
 COLUMNAS_OBLIGATORIAS = [
-    "evento_id", "pedido_id", "vehiculo_id", "timestamp",
-    "temperatura_c", "humedad_pct",
+    "evento_id",
+    "pedido_id",
+    "vehiculo_id",
+    "producto_tipo",
+    "timestamp",
+    "temperatura_c",
+    "humedad_pct",
 ]
 CAPAS_REQUERIDAS = ["raw/eventos", "processed/eventos"]
 CAPAS_OPCIONALES = [
@@ -125,6 +130,10 @@ def validar_eventos(df: pd.DataFrame) -> dict:
         raise ValueError(f"Faltan columnas del contrato en processed/eventos: {faltantes}")
     if df.empty:
         raise ValueError("processed/eventos no tiene filas")
+    
+    producto_invalido = (
+        df["producto_tipo"] != "producto_refrigerado"
+    ) & df["producto_tipo"].notna()
 
     filas = len(df)
     ts = pd.to_datetime(df["timestamp"], errors="coerce", utc=True)
@@ -150,6 +159,7 @@ def validar_eventos(df: pd.DataFrame) -> dict:
         "filas": filas,
         "filas_con_nulos": int(con_nulos.sum()),
         "filas_valores_imposibles": int(valores_imposibles.sum()),
+        "filas_producto_invalido": int(producto_invalido.sum()),
         "duplicados": duplicados,
         "clave_duplicados": clave_duplicados,
         "evento_id_repetidos_informativo": evento_id_repetidos,
@@ -168,7 +178,11 @@ def evaluar_calidad(validacion: dict, filas_raw: int) -> dict:
         return round(100.0 * (1 - malas / filas), 2)
 
     completitud = pct_ok(validacion["filas_con_nulos"])
-    validez = pct_ok(validacion["filas_valores_imposibles"])
+    malas_validez = (
+      validacion["filas_valores_imposibles"]
+        + validacion["filas_producto_invalido"]
+    )
+    validez = pct_ok(malas_validez)
     unicidad = pct_ok(validacion["duplicados"])
     # Parte de lo recibido en Kafka (raw) que llegó a processed sin descartarse.
     retencion = round(min(100.0, 100.0 * filas / filas_raw), 2) if filas_raw else 0.0

@@ -48,15 +48,16 @@ def parsear_eventos(df_kafka: DataFrame) -> DataFrame:
 def validar_eventos(df: DataFrame) -> DataFrame:
     """Castea el timestamp y descarta eventos incompletos o con valores imposibles."""
     df = df.withColumn("timestamp", F.to_timestamp("timestamp"))
+    
     return df.filter(
         F.col("evento_id").isNotNull()
         & F.col("pedido_id").isNotNull()
         & F.col("vehiculo_id").isNotNull()
+        & (F.col("producto_tipo") == "producto_refrigerado")
         & F.col("timestamp").isNotNull()
         & F.col("temperatura_c").between(-30, 60)
         & F.col("humedad_pct").between(0, 100)
     )
-
 
 # --- Transformación 2: marca de fuera de rango ---
 def marcar_fuera_de_rango(df: DataFrame) -> DataFrame:
