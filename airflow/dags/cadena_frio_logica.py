@@ -178,7 +178,11 @@ def evaluar_calidad(validacion: dict, filas_raw: int) -> dict:
         return round(100.0 * (1 - malas / filas), 2)
 
     completitud = pct_ok(validacion["filas_con_nulos"])
-    validez = pct_ok(validacion["filas_valores_imposibles"])
+    malas_validez = (
+    validacion["filas_valores_imposibles"]
+    + validacion["filas_producto_invalido"]
+)
+validez = pct_ok(malas_validez)
     unicidad = pct_ok(validacion["duplicados"])
     # Parte de lo recibido en Kafka (raw) que llegó a processed sin descartarse.
     retencion = round(min(100.0, 100.0 * filas / filas_raw), 2) if filas_raw else 0.0
