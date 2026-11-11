@@ -10,6 +10,8 @@ from kafka import KafkaProducer
 KAFKA_BROKER = 'localhost:9092'
 TOPIC = 'eventos-cadena-frio'
 EQUIPO = 'equipo-7'
+PEDIDOS = [f"PED-{i}" for i in range(100, 106)]
+pedido_id_actual = random.choice(PEDIDOS)
 
 # Rutas a los archivos JSON
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,8 +27,8 @@ def cargar_y_actualizar_evento(filepath):
     evento['evento_id'] = str(uuid.uuid4())
     evento['timestamp'] = datetime.now(timezone.utc).isoformat()
     
-    # Asignamos un pedido aleatorio para que varíe (y podamos probar la Key)
-    evento['pedido_id'] = f"PED-{random.randint(100, 999)}"
+    # Mantenemos el mismo pedido durante toda la ejecución
+    evento['pedido_id'] = pedido_id_actual
     
     return evento
 
