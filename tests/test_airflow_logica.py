@@ -19,6 +19,7 @@ def _df(filas):
         {
             "kafka_partition": 0, "kafka_offset": i, "evento_id": f"evt-{i}",
             "pedido_id": p, "vehiculo_id": "VEH-001",
+            "producto_tipo": "producto_refrigerado",
             "timestamp": BASE + timedelta(minutes=m),
             "temperatura_c": t, "humedad_pct": h,
         }
