@@ -45,26 +45,26 @@ consulta y análisis.
 Airflow coordina las tareas operativas y los controles definidos
 para el proyecto.
 
-## 5. Aspectos pendientes de definición
+## 5. Aspectos definidos durante el proyecto
 
-- Contrato JSON definitivo del evento.
-- Validación de los KPI y umbrales de alerta.
-- Formato y organización de los datos almacenados.
-- Tareas específicas que coordinará Airflow.
+- Contrato JSON del evento: `docs/contrato_evento.md` y `docs/schemas/evento_cadena_frio.schema.json`.
+- KPI y umbrales de alerta: `docs/kpi_alertas.md` (umbrales provisionales).
+- Formato y organización de los datos: Parquet en las capas raw, processed y curated (`datalake/README.md`).
+- Tareas de Airflow: DAG `cadena_frio_calidad_reportes` con seis tareas (`README.md`, sección 7).
 
 ## 6. Decisiones técnicas de Kafka
 
 ### 6.1. Tópico
 
-Se propone utilizar el tópico `cadena_frio_eventos` para publicar los eventos generados durante el transporte de productos sensibles a la temperatura.
+Se utiliza el tópico `eventos-cadena-frio` para publicar los eventos generados durante el transporte de productos sensibles a la temperatura.
 
 ### 6.2. Clave del mensaje
 
-Se propone utilizar `pedido_id` como clave del mensaje para agrupar los eventos de un mismo pedido en una misma partición y facilitar el procesamiento ordenado de sus eventos.
+Se utiliza `pedido_id` como clave del mensaje para agrupar los eventos de un mismo pedido en una misma partición y facilitar el procesamiento ordenado de sus eventos.
 
 ### 6.3. Número de particiones
 
-Se propone comenzar con 3 particiones para distribuir los eventos y permitir el procesamiento en paralelo. Esta configuración inicial podrá ajustarse según el volumen de datos y los recursos disponibles.
+Se comenzó con 3 particiones para distribuir los eventos y permitir el procesamiento en paralelo. Esta configuración puede ajustarse según el volumen de datos y los recursos disponibles.
 
 ### 6.4. Consumidor
 
