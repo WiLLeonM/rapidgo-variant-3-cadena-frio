@@ -261,4 +261,4 @@ Otras evidencias: `docs/evidencia/reporte_cadena_frio_2026-11-04.md` (primera ej
 ## 13. Entrega Final
 
 - **Release v1.0.0:** https://github.com/WiLLeonM/rapidgo-variant-3-cadena-frio/releases/tag/v1.0.0
-- **Video final (máximo 10 minutos):** ENLACE_DEL_VIDEO
+- **Video final (máximo 10 minutos): https://youtu.be/bHtZC1hcD0g
